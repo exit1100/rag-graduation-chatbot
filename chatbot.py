@@ -31,18 +31,33 @@ if "query" not in st.session_state:
     st.session_state.query = None
 
 with st.sidebar:
-    openai_api_key = st.text_input("OpenAI API KEY", type="password")
-    langchain_api_key = st.text_input("LangSmith API KEY (선택사항)", type="password")
+    api_provider = st.selectbox("API Provider", ["OpenAI", "Upstage"], key="api_provider_selection")
+    openai_api_key = st.text_input("OpenAI API KEY", type="password") if api_provider == "OpenAI" else None
+    upstage_api_key = st.text_input("Upstage API KEY", type="password") if api_provider == "Upstage" else None
+    langchain_api_key = st.text_input("LangSmith API KEY (선택)", type="password")
 
     if openai_api_key:
         st.session_state["openai_api_key"] = openai_api_key
         os.environ["OPENAI_API_KEY"] = st.session_state["openai_api_key"]
-    
+    else:
+        st.session_state.pop("openai_api_key", None)
+        os.environ.pop("OPENAI_API_KEY", None)
+
+    if upstage_api_key:
+        st.session_state["upstage_api_key"] = upstage_api_key
+        os.environ["UPSTAGE_API_KEY"] = st.session_state["upstage_api_key"]
+    else:
+        st.session_state.pop("upstage_api_key", None)
+        os.environ.pop("UPSTAGE_API_KEY", None)
+
     if langchain_api_key:
         st.session_state["langchain_api_key"] = langchain_api_key
+    else:
+        st.session_state.pop("langchain_api_key", None)
+        os.environ.pop("LANGCHAIN_API_KEY", None)
 
-    project_name = st.text_input("LangSmith 프로젝트 (선택사항)", value="SELF_LEARNING_GPT")
-    session_id = st.text_input("세션 ID(선택사항)")
+    project_name = st.text_input("LangSmith Project (선택)", value="RAG_GRADUATION")
+    session_id = st.text_input("Session ID (선택)")
     
 if not check_if_key_exists("langchain_api_key"):
     st.info(
@@ -64,9 +79,13 @@ else:
     else:
         cfg["configurable"] = {"session_id": str(uuid.uuid4())}
 
-if not check_if_key_exists("openai_api_key"):
+if not check_if_key_exists("openai_api_key") and api_provider == "OpenAI":
     st.info(
         "⚠️ [OpenAI API key](https://platform.openai.com/docs/guides/authentication) 를 추가해 주세요."
+    )
+elif not check_if_key_exists("upstage_api_key") and api_provider == "Upstage":
+    st.info(
+        "⚠️ Upstage API 키를 입력해 주세요."
     )
 
 if 'message_list' not in st.session_state:
@@ -82,7 +101,7 @@ if user_question := st.chat_input(placeholder="궁금한 내용들을 말씀해�
     st.session_state.message_list.append({"role": "user", "content": user_question})
 
     with st.spinner("답변을 생성하는 중입니다"):
-        ai_response = get_ai_response(user_question, cfg)
+        ai_response = get_ai_response(user_question, cfg, provider=api_provider)
         with st.chat_message("ai"):
             ai_message = st.write_stream(ai_response)
             st.session_state.message_list.append({"role": "ai", "content": ai_message})
