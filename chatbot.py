@@ -31,6 +31,9 @@ if "query" not in st.session_state:
     st.session_state.query = None
 
 with st.sidebar:
+    st.markdown("🔑 **Upstage API Key 발급(무료) : [Click](https://she11.tistory.com/252)**")
+    st.markdown("") 
+    st.markdown("") 
     api_provider = st.selectbox("API Provider", ["OpenAI", "Upstage"], key="api_provider_selection")
     openai_api_key = st.text_input("OpenAI API KEY", type="password") if api_provider == "OpenAI" else None
     upstage_api_key = st.text_input("Upstage API KEY", type="password") if api_provider == "Upstage" else None
