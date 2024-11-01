@@ -101,7 +101,7 @@ if user_question := st.chat_input(placeholder="궁금한 내용들을 말씀해�
     st.session_state.message_list.append({"role": "user", "content": user_question})
 
     with st.spinner("답변을 생성하는 중입니다"):
-        ai_response = get_ai_response(user_question, cfg, provider=api_provider)
+        ai_response = get_ai_response(user_question, cfg, api_provider)
         with st.chat_message("ai"):
             ai_message = st.write_stream(ai_response)
             st.session_state.message_list.append({"role": "ai", "content": ai_message})
