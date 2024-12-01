@@ -10,8 +10,16 @@ from langchain_core.tracers import LangChainTracer
 from streamlit_feedback import streamlit_feedback
 
 st.set_page_config(page_title="Graduation Chatbot", page_icon="🤖")
-st.title("🤖 중부대학교 졸업 챗봇")
+st.title("🎓 중부대학교 졸업 챗봇")
 st.caption("중부대학교 학과별 졸업 시 필요한 학점에 대해 알려드립니다.")
+
+st.markdown("""
+    <style>
+        body { background: linear-gradient(135deg, #0f2027, #203a43, #2c5364); }
+        h1, h2, h3 { color: #00d4ff; text-shadow: 0px 0px 20px #00d4ff; }
+    </style>
+""", unsafe_allow_html=True)
+
 
 def check_if_key_exists(key):
     return key in st.session_state
